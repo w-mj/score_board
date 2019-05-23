@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>抢答器</title>
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+</head>
+<style>
+#Responder {
+    position: absolute;
+    display: block;
+    font-size:3em;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+</style>
+<body>
+
+<div id="Responder">
+    <button class="btn btn-lg btn-primary" id="bttnn" onclick="race()">抢答</button>
+</div>
+
+<script>
+    let ws = new WebSocket('ws://127.0.0.1:8001');
+    ws.onmessage = (msg) => {
+        let btn = $("#bttnn");
+        msg = msg.data;
+        msg = JSON.parse(msg);
+        console.log(msg);
+        if (msg['act'] === 'success') {
+            btn.html("成功");
+            btn.removeClass('btn-primary');
+            btn.addClass('btn-success');
+        } else if (msg['act'] === 'reset') {
+            btn.html("抢答");
+            btn.removeClass('btn-success');
+            btn.addClass('btn-primary');
+        }
+    };
+    function race() {
+        ws.send('{"act": "race"}');
+    }
+</script>
+
+</body>
+</html>

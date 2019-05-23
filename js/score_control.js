@@ -95,3 +95,11 @@ function update() {
         success: update_table
     });
 }
+
+function responder_reset() {
+    ws.send('{"act": "reset"}');
+}
+
+function responder_start() {
+    ws.send('{"act": "start"}');
+}

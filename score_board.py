@@ -5,11 +5,32 @@ from simple_websocket_server import WebSocketServer, WebSocket
 sys.path.append('.')
 import content_type
 
+responder_status = 2  # 2 未开始, 1 已开始， 0已抢答
+mutex = threading.Lock()
 ws_client = []
 class WsServer(WebSocket):
     def handle(self):
         # 收到数据，在self.data中
-        pass
+        global responder_status
+        print('receive: ' + self.data)
+        msg = json.loads(self.data)
+        if msg['act'] == 'race':
+            mutex.acquire()
+            if responder_status == 1:
+                self.send_message('{"act": "success"}')
+                responder_status -= 1
+            mutex.release()
+        elif msg['act'] == 'reset':
+            mutex.acquire()
+            responder_status = 2
+            for c in ws_client:
+                c.send_message('{"act": "reset"}')
+            mutex.release()
+        elif msg['act'] == 'start':
+            mutex.acquire()
+            responder_status = 1
+            mutex.release()
+
 
     def connected(self):
         print(self.address, 'connected')
