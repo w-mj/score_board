@@ -1,4 +1,7 @@
 import http.server, json
+import sys
+sys.path.append('/home/wmj/Projects/chengyudasai22/')
+import content_type
 
 score_names = ["第一轮", "第二轮", "特别环节", "第三轮", "第四轮"]
 group_names = ["第一组", "第二组", "第三组", "第四组", "第五组", "第六组", 
@@ -35,7 +38,7 @@ class Server(http.server.BaseHTTPRequestHandler):
             try:
                 with open(path) as f:
                     self.send_response(200)
-                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Content-type', content_type.content_type.get(path.split('.')[-1], 'text/plain'))
                     self.send_header('Access-Control-Allow-Origin', '*')
                     self.end_headers()
                     self.wfile.write(f.read().encode())
