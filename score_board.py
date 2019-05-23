@@ -1,7 +1,24 @@
 import http.server, json
 import sys
-sys.path.append('/home/wmj/Projects/chengyudasai22/')
+import threading
+from simple_websocket_server import WebSocketServer, WebSocket
+sys.path.append('.')
 import content_type
+
+ws_client = []
+class WsServer(WebSocket):
+    def handle(self):
+        # 收到数据，在self.data中
+        pass
+
+    def connected(self):
+        print(self.address, 'connected')
+        ws_client.append(self)
+
+    def handle_close(self):
+        ws_client.remove(self)
+        print(self.address, 'closed')
+
 
 score_names = ["第一轮", "第二轮", "特别环节", "第三轮", "第四轮"]
 group_names = ["第一组", "第二组", "第三组", "第四组", "第五组", "第六组", 
@@ -66,11 +83,17 @@ class Server(http.server.BaseHTTPRequestHandler):
 
         with open("score.json", "w", encoding='utf-8') as f:
             f.write(json.dumps(score_dict, ensure_ascii=False))
+
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         self.wfile.write('{"result": "ok"}'.encode())
+
+        to_send = json.dumps(
+            {'act': 'score', 'score': [score_names, score_dict]})
+        for client in ws_client:
+            client.send_message(to_send)
 
     def do_OPTIONS(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -80,7 +103,16 @@ class Server(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b'{}')
 
+ip = '127.0.0.1'
+def ws_server():
+    print('Start Websocket server at ' + ip + ' 8001.')
+    server = WebSocketServer(ip, 8001, WsServer)
+    server.serve_forever()
 
 if __name__ == '__main__':
-    server = http.server.HTTPServer(('127.0.0.1', 8000), Server)
+    t = threading.Thread(target=ws_server)
+    t.start()
+    print('Start Http server at ' + ip + ' 8000.')
+    server = http.server.HTTPServer((ip, 8000), Server)
     server.serve_forever()
+    t.join()
