@@ -8,12 +8,14 @@ import content_type
 responder_status = 2  # 2 未开始, 1 已开始， 0已抢答
 mutex = threading.Lock()
 ws_client = []
+responder_client = []
 class WsServer(WebSocket):
     def handle(self):
         # 收到数据，在self.data中
         global responder_status
-        print('receive: ' + self.data)
         msg = json.loads(self.data)
+        if msg['act'] != 'responder_state':
+            print('receive: ' + self.data)
         if msg['act'] == 'race':
             mutex.acquire()
             if responder_status == 1:
@@ -30,6 +32,14 @@ class WsServer(WebSocket):
             mutex.acquire()
             responder_status = 1
             mutex.release()
+        elif msg['act'] == 'I AM RESPONDER!':
+            if self not in responder_client:
+                responder_client.append(self)
+        elif msg['act'] == 'responder_state':
+            self.send_message(json.dumps(
+                {'act': 'responder_state',
+                'state': [responder_status, len(responder_client)]}
+                ))
 
 
     def connected(self):
@@ -38,6 +48,7 @@ class WsServer(WebSocket):
 
     def handle_close(self):
         ws_client.remove(self)
+        responder_client.remove(self)
         print(self.address, 'closed')
 
 

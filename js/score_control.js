@@ -3,15 +3,37 @@ ws.onmessage = function(msg) {
     msg = msg.data;
     // console.log(msg);
     msg = JSON.parse(msg);
-    if (msg['act'] !== 'score')
-        return null;
-    update_table(msg['score'])
+    if (msg['act'] === 'score') {
+        update_table(msg['score']);
+    } else if (msg['act'] === 'responder_state') {
+        let state = '';
+        switch(msg['state'][0]) {
+            case 0:
+                state='已抢答';
+                break;
+            case 1:
+                state='正在抢答';
+                break;
+            case 2:
+                state='抢答未开始';
+                break;
+            default:
+                state='??' + msg['state'][0];
+                break;
+        }
+        $("#responder-state").html(state);
+        $("#responder-cnt").html(msg['state'][1]);
+    }
 };
 
 
 $(document).ready(()=>{
     // setInterval(update, 1000);
     update();
+
+    setInterval(()=>{
+        ws.send('{"act": "responder_state"}')
+    }, 1500);
 });
 
 function send_change(group, item, act) {
@@ -98,8 +120,10 @@ function update() {
 
 function responder_reset() {
     ws.send('{"act": "reset"}');
+    ws.send('{"act": "responder_state"}');
 }
 
 function responder_start() {
     ws.send('{"act": "start"}');
+    ws.send('{"act": "responder_state"}');
 }

@@ -11,11 +11,16 @@
 #Responder {
     position: absolute;
     display: block;
-    font-size:3em;
+    font-size: 3em;
     left:50%;
     top:50%;
     transform: translate(-50%,-50%);
 }
+    .btn {
+        width: 800px;
+        height: 400px;
+        font-size: larger;
+    }
 </style>
 <body>
 
@@ -25,6 +30,11 @@
 
 <script>
     let ws = new WebSocket('ws://127.0.0.1:8001');
+    ws.onopen = (e) => {
+        ws.send('{"act": "I AM RESPONDER!"}');
+    };
+    // $(document).ready(() => {
+    // });
     ws.onmessage = (msg) => {
         let btn = $("#bttnn");
         msg = msg.data;
