@@ -29,7 +29,9 @@
 </div>
 
 <script>
-    let ws = new WebSocket('ws://127.0.0.1:8001');
+    let url = window.location.origin;
+    let ws_url = "ws:" + url.split(':')[1] + ":8001";
+    let ws = new WebSocket(ws_url);
     ws.onopen = (e) => {
         ws.send('{"act": "I AM RESPONDER!"}');
     };

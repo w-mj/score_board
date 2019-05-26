@@ -1,4 +1,7 @@
-let ws = new WebSocket('ws://127.0.0.1:8001');
+let url = window.location.origin;
+let ws_url = "ws:" + url.split(':')[1] + ":8001";
+
+let ws = new WebSocket(ws_url);
 ws.onmessage = function(msg) {
     msg = msg.data;
     // console.log(msg);
@@ -39,7 +42,7 @@ $(document).ready(()=>{
 function send_change(group, item, act) {
     console.log(group + ' ' + item + ' ' + act);
     $.ajax({
-        url: 'http://127.0.0.1:8000',
+        url: url,
         method: 'POST',
         data: JSON.stringify({act: 'score', score: [group, item, act]}),
         contentType: 'text/plain',
@@ -52,7 +55,7 @@ function send_change(group, item, act) {
 function send_out(group, out) {
     console.log(group + ' ' + out);
     $.ajax({
-        url: 'http://127.0.0.1:8000',
+        url: url,
         method: 'POST',
         data: JSON.stringify({act: 'out', out: [group, out]}),
         contentType: 'text/plain',
@@ -65,7 +68,7 @@ function send_out(group, out) {
 function set_sort(s) {
     console.log('sort ' + s);
     $.ajax({
-        url: 'http://127.0.0.1:8000',
+        url: url,
         method: 'POST',
         data: JSON.stringify({act: 'sort', sort: s}),
         contentType: 'text/plain',
@@ -111,7 +114,7 @@ function update_table(data) {
 
 function update() {
     $.ajax({
-        url: 'http://127.0.0.1:8000',
+        url: url,
         method: 'GET',
         dataType: 'json',
         success: update_table

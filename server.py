@@ -30,7 +30,8 @@ class WsServer(WebSocket):
             mutex.release()
         elif msg['act'] == 'start':
             mutex.acquire()
-            responder_status = 1
+            if responder_status == 2:
+                responder_status = 1
             mutex.release()
         elif msg['act'] == 'I AM RESPONDER!':
             if self not in responder_client:

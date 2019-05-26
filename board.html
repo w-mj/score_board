@@ -25,7 +25,10 @@
 
 </body>
 <script>
-    let ws = new WebSocket('ws://127.0.0.1:8001');
+    let url = window.location.origin;
+    let ws_url = "ws:" + url.split(':')[1] + ":8001";
+
+    let ws = new WebSocket(ws_url);
     ws.onmessage = (msg) => {
         msg = msg.data;
         // console.log(msg);
@@ -36,7 +39,7 @@
     };
     $(document).ready(()=>{
         $.ajax({
-            url: 'http://127.0.0.1:8000',
+            url: url,
             method: 'GET',
             dataType: 'json',
             success: update
