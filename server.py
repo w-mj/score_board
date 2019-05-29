@@ -55,7 +55,7 @@ class WsServer(WebSocket):
 
 score_names = ["第一轮", "第二轮", "特别环节", "第三轮", "第四轮"]
 group_names = ["第一组", "第二组", "第三组", "第四组", "第五组", "第六组", 
-               "第七组", "第八组", "第九组", "第十组", "第十一组", "第十二组", "第十三组", "第十四组"]
+               "第七组", "第八组"]
 
 
 try:
@@ -86,12 +86,12 @@ class Server(http.server.BaseHTTPRequestHandler):
         else:
             path = self.path[1:]
             try:
-                with open(path) as f:
+                with open(path, 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-type', content_type.content_type.get(path.split('.')[-1], 'text/plain'))
                     self.send_header('Access-Control-Allow-Origin', '*')
                     self.end_headers()
-                    self.wfile.write(f.read().encode())
+                    self.wfile.write(f.read())
             except FileNotFoundError:
                 self.send_response(404)
                 self.end_headers()
@@ -136,7 +136,7 @@ class Server(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b'{}')
 
-ip = '127.0.0.1'
+ip = '0.0.0.0'
 def ws_server():
     print('Start Websocket server at ' + ip + ' 8001.')
     server = WebSocketServer(ip, 8001, WsServer)
