@@ -28,6 +28,8 @@
     <button class="btn btn-lg btn-primary" id="bttnn" onclick="race()">抢答</button>
 </div>
 
+<audio src="success.wav" id="success"></audio>
+
 <script>
     let url = window.location.origin;
     let ws_url = "ws:" + url.split(':')[1] + ":8001";
@@ -46,6 +48,7 @@
             btn.html("成功");
             btn.removeClass('btn-primary');
             btn.addClass('btn-success');
+            document.getElementById("success").play();
         } else if (msg['act'] === 'reset') {
             btn.html("抢答");
             btn.removeClass('btn-success');
